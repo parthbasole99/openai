@@ -9,10 +9,11 @@ class OpenAIChatCompletionChoiceMessageContentItemModel {
   /// The text content of the item.
   final String? text;
 
-  /// The image url object.
-  final Map<String, dynamic>? imageUrl;
+  /// The image url content of the item.
+  final String? imageUrl;
 
-  final String? imageBase64;
+  // The image fidelity
+  final String? imageFidelity;
 
   @override
   int get hashCode => type.hashCode ^ text.hashCode ^ imageUrl.hashCode;
@@ -22,7 +23,7 @@ class OpenAIChatCompletionChoiceMessageContentItemModel {
     required this.type,
     this.text,
     this.imageUrl,
-    this.imageBase64,
+    this.imageFidelity,
   });
 
   /// This is used to convert a [Map<String, dynamic>] object to a [OpenAIChatCompletionChoiceMessageContentItemModel] object.
@@ -33,7 +34,6 @@ class OpenAIChatCompletionChoiceMessageContentItemModel {
       type: asMap['type'],
       text: asMap['text'],
       imageUrl: asMap['image_url'],
-      imageBase64: asMap['imageBase64'],
     );
   }
 
@@ -48,19 +48,11 @@ class OpenAIChatCompletionChoiceMessageContentItemModel {
   /// Represents a image content item factory, which is used to create a image [OpenAIChatCompletionChoiceMessageContentItemModel].
   factory OpenAIChatCompletionChoiceMessageContentItemModel.imageUrl(
     String imageUrl,
+    {String? imageFidelity}
   ) {
     return OpenAIChatCompletionChoiceMessageContentItemModel._(
       type: 'image_url',
-      imageUrl: {'url': imageUrl},
-    );
-  }
-
-  factory OpenAIChatCompletionChoiceMessageContentItemModel.imageBase64(
-    String imageBase64,
-  ) {
-    return OpenAIChatCompletionChoiceMessageContentItemModel._(
-      type: 'image_base64',
-      imageBase64: imageBase64,
+      imageUrl: imageUrl,
     );
   }
 
@@ -69,9 +61,10 @@ class OpenAIChatCompletionChoiceMessageContentItemModel {
     return {
       "type": type,
       if (text != null) "text": text,
-      if (imageUrl != null) "image_url": imageUrl,
-      if (imageBase64 != null)
-        "image_url": {"url": "data:image/jpeg;base64,${imageBase64}"}
+      if (imageUrl != null)
+        "image_url": imageFidelity == null
+            ? {"url": imageUrl}
+            : {"url": imageUrl, "detail": imageFidelity},
     };
   }
 
@@ -83,8 +76,7 @@ class OpenAIChatCompletionChoiceMessageContentItemModel {
 
     return other.type == type &&
         other.text == text &&
-        other.imageUrl == imageUrl &&
-        other.imageBase64 == imageBase64;
+        other.imageUrl == imageUrl;
   }
 
   @override
@@ -93,8 +85,6 @@ class OpenAIChatCompletionChoiceMessageContentItemModel {
           'OpenAIChatCompletionChoiceMessageContentItemModel(type: $type, text: $text)',
         'image' =>
           'OpenAIChatCompletionChoiceMessageContentItemModel(type: $type, imageUrl: $imageUrl)',
-        'image_base64' =>
-          'OpenAIChatCompletionChoiceMessageContentItemModel(type: $type, imageBase64: $imageBase64)',
         _ => 'OpenAIChatCompletionChoiceMessageContentItemModel(type: $type)',
       };
 }
